@@ -21,10 +21,25 @@ func TestRacer(t *testing.T) {
 		fastURL := fastServer.URL
 
 		want := fastURL
-		got := Racer(slowURL, fastURL)
+		got, _ := Racer(slowURL, fastURL)
 
 		if got != want {
 			t.Errorf("got %q, want %q", got, want)
+		}
+	})
+
+	t.Run("times out after 10 seconds", func(t *testing.T) {
+		t.Helper()
+		aServer := makeDelayedServer(11 * time.Second)
+		bServer := makeDelayedServer(12 * time.Second)
+
+		defer aServer.Close()
+		defer bServer.Close()
+
+		_, err := Racer(aServer.URL, bServer.URL)
+
+		if err == nil {
+			t.Error("expected a timeout error, but didn't get one")
 		}
 	})
 
