@@ -21,8 +21,19 @@ func (p *PlayerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, p.store.GetPlayerScore(player))
 }
 
+///
+
+type InMemoryPlayerStore struct{}
+
+func (i *InMemoryPlayerStore) GetPlayerScore(name string) int {
+	return 123
+}
+
+///
+
 func main() {
-	server := &PlayerServer{}
+	store := &InMemoryPlayerStore{}
+	server := &PlayerServer{store}
 	if err := http.ListenAndServe(":5000", server); err != nil {
 		log.Fatalf("could not listen on port 5000 %v", err)
 	}
